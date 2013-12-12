@@ -37,29 +37,46 @@
 *   Macros
 *****************************************************************************/
 
-
+#if ZERO
+#define MOTOR_eye_enable() PORTE |= _BV(PE2); // activate photo eye
+#define MOTOR_eye_disable() PORTE &= ~_BV(PE2); // deactivate photo eye
+#define MOTOR_eye_test() (PORTE & _BV(PE2))
+#else
 #define MOTOR_eye_enable() PORTE |= _BV(PE3); // activate photo eye
 #define MOTOR_eye_disable() PORTE &= ~_BV(PE3); // deactivate photo eye
 #define MOTOR_eye_test() (PORTE & _BV(PE3))
+#endif
 
 // How is the H-Bridge connected to the AVR?
 
 static inline void MOTOR_H_BRIDGE_open(void) {
+#if ZERO
+	PORTE |= _BV(PE7);
+#else
    PORTG  =  (1<<PG4);   // PG3 LOW, PG4 HIGH
 #if THERMOTRONIC!=1   //not needed (no enable-Pin for motor) 
    PORTB |=  (1<<PB7);   // PB7 HIGH
 #endif
+#endif
 }
 static inline void MOTOR_H_BRIDGE_close(void) {
+#if ZERO
+	PORTE |= _BV(PE6);
+#else
    PORTG  =  (1<<PG3);   // PG3 HIGH, PG4 LOW
 #if THERMOTRONIC!=1   //not needed (no enable-Pin for motor) 
    PORTB &= ~(1<<PB7);   // PB7 LOW
 #endif
+#endif
 }
 static inline void MOTOR_H_BRIDGE_stop(void) {
+#if ZERO
+	PORTE &= ~(_BV(PE6) | _BV(PE7));
+#else
    PORTG  =  0;          // PG3 LOW, PG4 LOW
 #if THERMOTRONIC!=1   //not needed (no enable-Pin for motor) 
    PORTB &= ~(1<<PB7);   // PB7 LOW
+#endif
 #endif
 }
 

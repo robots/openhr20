@@ -66,6 +66,8 @@ static bool allow_rewoke = false;
 void task_keyboard(void) {
 
  
+#if ZERO
+#else
  {	// wheel
 	uint8_t wheel= keys & (KBI_ROT1 | KBI_ROT2);
 	if ((wheel ^ state_wheel_prev) & KBI_ROT1) {	//only ROT1 have interrupt, change detection
@@ -87,8 +89,13 @@ void task_keyboard(void) {
 		state_wheel_prev = wheel;
 	}
  } // wheel
+#endif
  { // other keys
+#if ZERO
+ 	uint8_t front = keys & ( KBI_PROG | KBI_C | KBI_AUTO | KBI_ROT1 | KBI_ROT2);
+#else
  	uint8_t front = keys & ( KBI_PROG | KBI_C | KBI_AUTO);
+#endif
 	if (front != state_front_prev) {
 		if (front && (state_front_prev == 0) && kb_timeout) {
 			if (front == KBI_PROG) {
@@ -100,7 +107,13 @@ void task_keyboard(void) {
 			} else if (front == KBI_AUTO) {
 				kb_events |= KB_EVENT_AUTO;
 				allow_rewoke = true;
-			} 
+#if ZERO
+			} else if (front == KBI_ROT1) {
+				kb_events |= KB_EVENT_WHEEL_MINUS;
+			} else if (front == KBI_ROT2) {
+				kb_events |= KB_EVENT_WHEEL_PLUS;
+#endif
+			}
 		}
 
         if (allow_rewoke) {

@@ -66,6 +66,10 @@ else ifeq ($(HW),HR25)
 	MCU = atmega329pa
 	F_CPU = 4000000
 	TARGET = hr25
+else ifeq ($(HW),ZERO)
+	MCU = atmega169p
+	F_CPU = 1000000
+	TARGET = zero
 endif
 
 
@@ -99,8 +103,8 @@ SRC_B =  \
     adc.c \
     eeprom.c \
     menu.c \
-    lcd.c \
     rs232_485_hw.c \
+
 
 
 # List Assembler source files here.
@@ -202,6 +206,13 @@ ifeq ($(HW),HR25)
     CFLAGS += -DHR25=1
 endif
 
+ifeq ($(HW),ZERO)
+	CFLAGS += -DZERO=1
+	SRC_B += lcd-new.c 
+else
+	SRC_B += lcd-old.c 
+endif
+
 #---------------- Assembler Options ----------------
 #  -Wa,...:   tell GCC to pass this to the assembler.
 #  -adhlns:   create listing
@@ -275,6 +286,7 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 #LDFLAGS += -T linker_script.x
 #LDFLAGS += --relax
 #LDFLAGS += --combine -fwhole-program
+LDFLAGS += -L/usr/avr/lib/avr5
 
 
 #---------------- Programming Options (avrdude) ----------------
@@ -441,7 +453,7 @@ end:
 # Display size of file.
 HEXSIZE = $(SIZE) --target=$(FORMAT) $(TARGET).hex
 
-ELFSIZE = $(SIZE) --mcu=$(MCU) --format=avr $(TARGET).elf
+ELFSIZE = $(SIZE) $(TARGET).elf
 
 
 sizebefore:

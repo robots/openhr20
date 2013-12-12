@@ -457,9 +457,11 @@ static void show_selected_temperature_type (uint8_t type, uint8_t mode) {
     //  temperature3              SUN
     LCD_SetSeg(LCD_SEG_SNOW,((type==temperature0)
         ?mode:LCD_MODE_OFF));
-    LCD_SetSeg(LCD_SEG_MOON,(((type==temperature1)||(type==temperature2))
+    LCD_SetSeg(LCD_SEG_MOON,((type==temperature1)
         ?mode:LCD_MODE_OFF));
-    LCD_SetSeg(LCD_SEG_SUN,((type>=temperature2)
+    LCD_SetSeg(LCD_SEG_OUTDOOR,((type==temperature2)
+        ?mode:LCD_MODE_OFF));
+    LCD_SetSeg(LCD_SEG_INDOOR,((type==temperature3)
         ?mode:LCD_MODE_OFF));
 }
 
@@ -490,13 +492,15 @@ void menu_view(bool clear) {
     case menu_set_hour:
     case menu_set_minute: 
     case menu_home4: // time
-        if (clear) clr_show2(LCD_SEG_COL1,LCD_SEG_COL2);
+//        if (clear) clr_show2(LCD_SEG_COL1,LCD_SEG_COL2);
+        if (clear) clr_show1(LCD_SEG_COL2);
         LCD_PrintDec(RTC_GetHour(), 2, ((menu_state == menu_set_hour) ? LCD_MODE_BLINK_1 : LCD_MODE_ON));
         LCD_PrintDec(RTC_GetMinute(), 0, ((menu_state == menu_set_minute) ? LCD_MODE_BLINK_1 : LCD_MODE_ON));
        break;                                       
 #else
     case menu_home4: // time
-        if (clear) clr_show2(LCD_SEG_COL1,LCD_SEG_COL2);
+//        if (clear) clr_show2(LCD_SEG_COL1,LCD_SEG_COL2);
+        if (clear) clr_show1(LCD_SEG_COL2);
         LCD_PrintDec(RTC_GetHour(), 2,  LCD_MODE_ON);
         LCD_PrintDec(RTC_GetMinute(), 0, LCD_MODE_ON);
        break;                                       
@@ -520,15 +524,22 @@ void menu_view(bool clear) {
         } else {
             if (clear) clr_show1(LCD_SEG_BAR24);
             if (CTL_error!=0) {
+#if ZERO==0
                 if (CTL_error & CTL_ERR_BATT_LOW) {
                     LCD_PrintStringID(LCD_STRING_BAtt,LCD_MODE_BLINK_1);
-                } else if (CTL_error & CTL_ERR_MONTAGE) {
+                } else
+#endif
+								if (CTL_error & CTL_ERR_MONTAGE) {
                     LCD_PrintStringID(LCD_STRING_E2,LCD_MODE_ON);
                 } else if (CTL_error & CTL_ERR_MOTOR) {
                     LCD_PrintStringID(LCD_STRING_E3,LCD_MODE_ON);
-                } else if (CTL_error & CTL_ERR_BATT_WARNING) {
+                } else
+#if ZERO==0
+								if (CTL_error & CTL_ERR_BATT_WARNING) {
                     LCD_PrintStringID(LCD_STRING_BAtt,LCD_MODE_ON);
-                } else if (CTL_error & CTL_ERR_RFM_SYNC) {
+                } else
+#endif
+								if (CTL_error & CTL_ERR_RFM_SYNC) {
                     LCD_PrintStringID(LCD_STRING_E4,LCD_MODE_ON);
                 }
                 goto MENU_COMMON_STATUS; // optimization
@@ -547,6 +558,10 @@ void menu_view(bool clear) {
         MENU_COMMON_STATUS:
         LCD_SetSeg(LCD_SEG_AUTO, (CTL_test_auto()?LCD_MODE_ON:LCD_MODE_OFF));
         LCD_SetSeg(LCD_SEG_MANU, (CTL_mode_auto?LCD_MODE_OFF:LCD_MODE_ON));
+#if ZERO
+				if (CTL_error & (CTL_ERR_BATT_LOW | CTL_ERR_BATT_WARNING))
+					LCD_SetSeg(LCD_SEG_BAT, (CTL_error & CTL_ERR_BATT_LOW)?LCD_MODE_BLINK_1:LCD_MODE_ON);
+#endif
         LCD_HourBarBitmap(hourbar_buff);
        break;
     case menu_home2: // real temperature
@@ -574,7 +589,8 @@ void menu_view(bool clear) {
     case menu_set_timmer:
         //! \todo calculate "hourbar" status, actual position in mode LCD_MODE_BLINK_1
         
-        clr_show3(LCD_SEG_COL1,LCD_SEG_COL2,LCD_SEG_PROG);
+//        clr_show3(LCD_SEG_COL1,LCD_SEG_COL2,LCD_SEG_PROG);
+        clr_show2(LCD_SEG_COL1,LCD_SEG_COL2);
         timmers_patch_offset=timers_get_raw_index(menu_set_dow, menu_set_slot);
         timmers_patch_data = menu_set_time +  ((uint16_t)menu_set_mode<<12);
         LCD_HourBarBitmap(RTC_DowTimerGetHourBar(menu_set_dow));

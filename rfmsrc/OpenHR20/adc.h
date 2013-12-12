@@ -37,7 +37,12 @@
 *   Macros
 *****************************************************************************/
 
-// hardware configuration 
+// hardware configuration
+#if ZERO
+#define ADC_TEMP_MUX        0x01
+#define ADC_UB_MUX         0x1E    //!< ADC-Channel for Ub          (ADMUX)
+#define ADC_ACT_TEMP       PF3     //!< Bit to activate the TempSensor
+#else
 #if THERMOTRONIC==1
 #define ADC_TEMP_MUX       0x00    //!< ADC-Channel for Temp-Sensor (ADMUX)
 #define ADC_UB_MUX         0x1E    //!< ADC-Channel for Ub          (ADMUX)
@@ -47,6 +52,8 @@
 #define ADC_UB_MUX         0x1E    //!< ADC-Channel for Ub          (ADMUX)
 #define ADC_ACT_TEMP       PF3     //!< Bit to activate the TempSensor
 #endif
+#endif
+
 #define ADC_ACT_TEMP_P     PORTF   //!< Prot of ADC_ACT_TEMP
 
 #define TEMP_RING_TYPE 1
