@@ -903,7 +903,7 @@ void task_lcd_update(void) {
 	if (LCD_force_update) {
 		LCD_force_update = 0;
 		for (i = 0; i < LCD_REGISTER_COUNT; i++) {
-			lcd_regs[i] = LCD_Data[LCD_Bitplane][0];
+			lcd_regs[i] = LCD_Data[LCD_Bitplane][i];
 		}
 	}
 
