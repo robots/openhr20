@@ -59,14 +59,13 @@ extern uint16_t kb_events;
 
 // names for keys
 #if ZERO
-#define KBI_MONT 0
-#define KBI_C		(1 << 4)
+#define KBI_MONT  0
+#define KBI_C 		(1 << 4)
 #define KBI_PROG	(1 << 5)
 #define KBI_AUTO	(1 << 6)
 #define KBI_ROT1	(1 << 7)
 #define KBI_ROT2	(1 << 0)
-#else
-#if THERMOTRONIC==1
+#elif THERMOTRONIC==1
 #define KBI_MONT 	(1 << 0)
 #define KBI_C		(1 << 2) 
 #define KBI_PROG	(1 << 1) 
@@ -81,7 +80,6 @@ extern uint16_t kb_events;
 #define KBI_ROT1	(1 << 5)
 #define KBI_ROT2	(1 << 6)
 #endif
-#endif
 
 extern uint8_t state_wheel_prev;
 void task_keyboard(void);
@@ -93,22 +91,15 @@ bool mont_contact_pooling(void);
 #define disable_rot2_input()
 #define enable_mont_input()
 #define disable_mont_input()
-#else
-#if THERMOTRONIC==1
+#elif THERMOTRONIC==1
 //THERMOTRONIC has no contact, not needed this macros
 #define enable_mont_input()
 #define disable_mont_input()
-#else
-#define enable_mont_input() ( DDRB &= ~(1<<PB0), PORTB |= (1<<PB0) )
-#define disable_mont_input() ( PORTB &= ~(1<<PB0), DDRB |= (1<<PB0) )
-#endif
-
-#if THERMOTRONIC==1
-// THERMOTRONIC has external pull-down resistors, not needed this macros 
 #define enable_rot2_input() 
 #define disable_rot2_input()
 #else
+#define enable_mont_input() ( DDRB &= ~(1<<PB0), PORTB |= (1<<PB0) )
+#define disable_mont_input() ( PORTB &= ~(1<<PB0), DDRB |= (1<<PB0) )
 #define enable_rot2_input() ( DDRB &= ~(1<<PB6), PORTB |= (1<<PB6) )
 #define disable_rot2_input() ( PORTB &= ~(1<<PB6), DDRB |= (1<<PB6) )
-#endif
 #endif

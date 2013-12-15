@@ -202,7 +202,7 @@ void task_keyboard_long_press_detect(void) {
  *  - read keyboard status
  ******************************************************************************/
 bool mont_contact_pooling(void){
-#if THERMOTRONIC || DEBUG_IGNORE_MONT_CONTACT
+#if THERMOTRONIC || ZERO || DEBUG_IGNORE_MONT_CONTACT
 	return 1; //no contact - exit!
 #else
    bool mont_contact;

@@ -41,10 +41,30 @@
 #define MOTOR_eye_enable() PORTE |= _BV(PE2); // activate photo eye
 #define MOTOR_eye_disable() PORTE &= ~_BV(PE2); // deactivate photo eye
 #define MOTOR_eye_test() (PORTE & _BV(PE2))
-#else
+
+#define MOTOR_EYE_POL 0 // low pulses
+#define MOTOR_EYE_IN  PE3 // used for PCMSK0 and PINE
+#define MOTOR_PWM     0
+
+#elif THERMOTRONIC
 #define MOTOR_eye_enable() PORTE |= _BV(PE3); // activate photo eye
 #define MOTOR_eye_disable() PORTE &= ~_BV(PE3); // deactivate photo eye
 #define MOTOR_eye_test() (PORTE & _BV(PE3))
+
+#define MOTOR_EYE_POL 0 // low pulses
+#define MOTOR_EYE_IN  PE1 // used for PCMSK0 and PINE
+#define MOTOR_PWM     0
+
+#else
+
+#define MOTOR_eye_enable() PORTE |= _BV(PE3); // activate photo eye
+#define MOTOR_eye_disable() PORTE &= ~_BV(PE3); // deactivate photo eye
+#define MOTOR_eye_test() (PORTE & _BV(PE3))
+
+#define MOTOR_EYE_POL 1 // high pulses
+#define MOTOR_EYE_IN  PE4 // used for PCMSK0 and PINE
+#define MOTOR_PWM     1
+
 #endif
 
 // How is the H-Bridge connected to the AVR?

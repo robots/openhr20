@@ -47,9 +47,28 @@
 // jiris internal wiring:       rfm_sck=pf1     rfm_sdi=pf0     rfm_nsel=pa3     rfm_sdo=pe6=pcint6    rfm_nirq=open
 // marios external jtag wiring: rfm_sck=pf4=tck rfm_sdi=pf6=tdo rfm_nsel=pf5=tms rfm_sdo=pe2=pcint2    rfm_nirq=open
 // tomas internal wiring:       rfm_sck=pf1     rfm_sdi=pf7     rfm_nsel=pf0     rfm_sdo=pe6=pcint6    rfm_nirq=open
+// zero jtag wiring:            rfm_sck=pf4=tck rfm_sdi=pf6=tdo rfm_nsel=pf5=tms rfm_sdo=pe4=pcint4    rfm_nirq=open
 
+#if (RFM_WIRE_ZEROJTAG == 1)
+	#define RFM_SCK_DDR			DDRF
+	#define RFM_SCK_PORT		PORTF
+	#define RFM_SCK_BITPOS		4
 
-#if (RFM_WIRE_MARIOJTAG == 1)
+	#define RFM_SDI_DDR			DDRF
+	#define RFM_SDI_PORT		PORTF
+	#define RFM_SDI_BITPOS		6
+
+	#define RFM_NSEL_DDR		DDRF
+	#define RFM_NSEL_PORT		PORTF
+	#define RFM_NSEL_BITPOS		5
+
+	#define RFM_SDO_DDR			DDRE
+	#define RFM_SDO_PIN			PINE
+	#define RFM_SDO_BITPOS		4
+
+	#define RFM_SDO_PCINT		PCINT4
+
+#elif (RFM_WIRE_MARIOJTAG == 1)
 
 	#define RFM_SCK_DDR			DDRF
 	#define RFM_SCK_PORT		PORTF

@@ -42,8 +42,7 @@
 #define ADC_TEMP_MUX        0x01
 #define ADC_UB_MUX         0x1E    //!< ADC-Channel for Ub          (ADMUX)
 #define ADC_ACT_TEMP       PF3     //!< Bit to activate the TempSensor
-#else
-#if THERMOTRONIC==1
+#elif THERMOTRONIC
 #define ADC_TEMP_MUX       0x00    //!< ADC-Channel for Temp-Sensor (ADMUX)
 #define ADC_UB_MUX         0x1E    //!< ADC-Channel for Ub          (ADMUX)
 #define ADC_ACT_TEMP       PF2   //!< Bit to activate the TempSensor
@@ -51,7 +50,6 @@
 #define ADC_TEMP_MUX       0x02    //!< ADC-Channel for Temp-Sensor (ADMUX)
 #define ADC_UB_MUX         0x1E    //!< ADC-Channel for Ub          (ADMUX)
 #define ADC_ACT_TEMP       PF3     //!< Bit to activate the TempSensor
-#endif
 #endif
 
 #define ADC_ACT_TEMP_P     PORTF   //!< Prot of ADC_ACT_TEMP

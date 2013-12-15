@@ -107,7 +107,7 @@ int __attribute__ ((noreturn)) main(void)
         task_lcd_update();
         for(;;) {;}  //fatal error, stop startup
     }
-#if THERMOTRONIC != 1
+#if !((THERMOTRONIC == 1) || (ZERO == 1))
 	COM_init();
 #endif
     #if RFM
@@ -382,20 +382,22 @@ static inline void init(void)
     //! Power reduction mode
     power_down_ADC();
 
+#if ZERO
+	DDRE|= _BV(PE6) | _BV(PE7);
+#else
     //! digital I/O port direction
     DDRG = (1<<PG3)|(1<<PG4); // PG3, PG4 Motor out
+#endif
 
     //! enable pullup on all inputs (keys and m_wheel)
     //! ATTENTION: PB0 & PB6 is input, but we will select it only for read
 #if ZERO
 	PORTB = (1<<PB0)|(1<<PB4)|(1<<PB5)|(0<<PB6)|(0<<PB7);
-#else
-#if THERMOTRONIC==1
+#elif THERMOTRONIC
 	PORTB = (1<<PB0)|(1<<PB1)|(1<<PB2)|(0<<PB4)|(0<<PB5);
 #else
     PORTB = (0<<PB0)|(1<<PB1)|(1<<PB2)|(1<<PB3)|(0<<PB6);
     DDRB = (1<<PB0)|(1<<PB4)|(1<<PB7)|(1<<PB6); // PB4, PB7 Motor out
-#endif
 #endif
 
 #if (RFM_WIRE_MARIOJTAG == 1)
@@ -442,16 +444,14 @@ static inline void init(void)
 
 #if ZERO
     //! PCMSK1 for keyactions
-    PCMSK1 = (1<<PCINT8)|(1<<PCINT12)|(1<<PCINT13)|(1<<PCINT14)|(1<<PCINT15);
-#else
-#if THERMOTRONIC==1
+    PCMSK1 = _BV(PCINT8) | _BV(PCINT12) | _BV(PCINT13) | _BV(PCINT14) | _BV(PCINT15);
+#elif THERMOTRONIC==1
 	PCMSK0=(1<<PCINT1);
     //! PCMSK1 for keyactions
     PCMSK1 = (1<<PCINT9)|(1<<PCINT10)|(1<<PCINT8)|(1<<PCINT12);
 #else
     //! PCMSK1 for keyactions
     PCMSK1 = (1<<PCINT9)|(1<<PCINT10)|(1<<PCINT11)|(1<<PCINT13);
-#endif
 #endif
 
     //! activate PCINT0 + PCINT1
