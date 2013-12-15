@@ -134,18 +134,19 @@ void task_lcd_update(void);
 #define LCD_SEG_MANU       120
 #define LCD_PADLOCK        143
 
-#define LCD_SEG_COL1       135
-#define LCD_SEG_COL2       0
+#define LCD_SEG_COL1       63
+#define LCD_SEG_COL2       135
 
 #define LCD_SEG_RADIO      23
 #define LCD_SEG_BAT        103
 
-#define LCD_SEG_SNOW       104
-#define LCD_SEG_MOON       144
+#define LCD_SEG_SNOW       144
+#define LCD_SEG_MOON       104
 #define LCD_SEG_INDOOR     24
 #define LCD_SEG_OUTDOOR    64
+#define LCD_SEG_BAG        40
 
-#define LCD_SEG_BAR24      0xff
+#define LCD_SEG_BAR24      0
 
 
 

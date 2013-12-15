@@ -78,7 +78,7 @@ volatile uint8_t LCD_Data[LCD_BITPLANES][LCD_REGISTER_COUNT];
 #endif
 
 
-#if LANG==LANG_uni
+#if 1// LANG==LANG_uni
   // Look-up chars table for LCD strings (universal/numbers)
   const uint8_t LCD_StringTable[][4] PROGMEM =
   {
@@ -163,7 +163,7 @@ volatile uint8_t LCD_Data[LCD_BITPLANES][LCD_REGISTER_COUNT];
 static const uint16_t Font[] PROGMEM = {
 			0x00C0, // -
 			0, // .
-			0x21c0, // /  - "°" sign
+			0x00e3, // /  - "degree" sign
 			0x003F,		//0
 			0x0406,		//1
 			0x00DB,		//2
