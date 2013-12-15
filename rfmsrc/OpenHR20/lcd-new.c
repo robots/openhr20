@@ -216,8 +216,9 @@ static const uint16_t Font[] PROGMEM = {
  */
 #define SEGMENTS_PER_DIGIT 14
 static const uint8_t DigitSegments[] PROGMEM = {
-	126,124, 44,  5,  7,127, 47, 85, 87, 86,125, 6, 46,  45,	//left Digit
-	123,121,  1,  2,  4, 84, 43, 81, 83, 82,122, 3, 42,  41,	//middle left Digit
+	//a   b   c   d   e   f  g1  g2   h   i   j   k   l   m
+	126,124, 44,  5,  7,127, 47, 85, 87, 86,125,  6, 46, 45,	//left Digit
+	123,121,  1,  2,  4, 84, 43, 81, 83, 82,122,  3, 42, 41,	//middle left Digit
 	137,139, 59, 18, 16,136, 56, 98, 96, 97,138, 17, 57, 58,	//middle right Digit
 	140,142, 22, 21, 19, 99, 60,102,100,101,141, 20, 61, 62		//right Digit
 };
@@ -344,8 +345,9 @@ void LCD_PrintChar(uint8_t value, uint8_t pos, uint8_t mode)
 	if (pos >= LCD_MAX_POS)
 		return;
 
-	if (LCD_upside_down)
-		pos = 3 - pos;
+#ifndef LCD_UPSIDE_DOWN
+	pos = 3 - pos;
+#endif
 
 	segments = pgm_read_word(&Font[value - FONT_ASCII_OFFSET]);
 	segmentOffset = pos * SEGMENTS_PER_DIGIT;
@@ -641,7 +643,7 @@ void LCD_HourBarBitmap(uint32_t bitmap)
 	for(i = 0; i < sizeof(BargraphSegments); ++i)
 	{
 		LCD_SetSeg(pgm_read_byte(&BargraphSegments[i]), ((uint8_t)bitmap & 1)? LCD_MODE_ON : LCD_MODE_OFF );
-		bitmap = bitmap>>1;
+		bitmap = bitmap >> 1;
 	}
 }
 
@@ -786,47 +788,49 @@ void LCD_ClearNumbers(void)
  ******************************************************************************/
 void LCD_SetSeg(uint8_t seg, uint8_t mode)
 {
-    uint8_t r;
-    uint8_t b;
+	uint8_t r;
+	uint8_t b;
 
-    // Register = segment DIV 8
-    r = seg / 8;
-    // Bitposition = segment mod 8
-    b = 1<<(seg % 8);
+	// Register = segment DIV 8
+	r = seg / 8;
+	// Bitposition = segment mod 8
+	b = 1 << (seg % 8);
 
 	if (r > LCD_REGISTER_COUNT) {
 		return;
 	}
-    // Set bits in each bitplane
-	#if LCD_BITPLANES == 2
-        if (mode & 1){
-            // Set Bit in Bitplane if ON (0b11) or Blinkmode 1 (0b01)
-            LCD_Data[0][r] |= b;
-        } else {
-            // Clear Bit in Bitplane if OFF (0b00) or Blinkmode 2 (0b10)
-            LCD_Data[0][r] &= ~b;
-        } 
-        if (mode & 2){
-            // Set Bit in Bitplane if ON (0b11) or Blinkmode 2 (0b10)
-            LCD_Data[1][r] |= b;
-        } else {
-            // Clear Bit in Bitplane if OFF (0b00) or Blinkmode 1 (0b01)
-            LCD_Data[1][r] &= ~b;
-        } 
-    #else
-      {
-        uint8_t bp;
-        for (bp=0; bp<LCD_BITPLANES;  bp++){
-            if (mode & (1<<bp)){
-                // Set Bit in Bitplane if ON (0b11) or Blinkmode 1 (0b01)
-                LCD_Data[bp][r] |= b;
-            } else {
-                // Clear Bit in Bitplane if OFF (0b00) or Blinkmode 2 (0b10)
-                LCD_Data[bp][r] &= ~b;
-            }
-        }
-      }
-    #endif
+
+	// Set bits in each bitplane
+#if LCD_BITPLANES <= 2
+	if (mode & 1) {
+		// Set Bit in Bitplane if ON (0b11) or Blinkmode 1 (0b01)
+		LCD_Data[0][r] |= b;
+	} else {
+		// Clear Bit in Bitplane if OFF (0b00) or Blinkmode 2 (0b10)
+		LCD_Data[0][r] &= ~b;
+	} 
+#if LCD_BITPLANES == 2
+	if (mode & 2){
+		// Set Bit in Bitplane if ON (0b11) or Blinkmode 2 (0b10)
+		LCD_Data[1][r] |= b;
+  } else {
+		// Clear Bit in Bitplane if OFF (0b00) or Blinkmode 1 (0b01)
+		LCD_Data[1][r] &= ~b;
+	}
+#endif
+#else
+	{
+		uint8_t bp;
+		for (bp = 0; bp < LCD_BITPLANES; bp++){
+			if (mode & 1){
+				LCD_Data[bp][r] |= b;
+			} else {
+				LCD_Data[bp][r] &= ~b;
+			}
+			mode >>= 1;
+		}
+	}
+#endif
 	LCD_calc_used_bitplanes(mode);
 }
 
@@ -844,23 +848,24 @@ static void LCD_calc_used_bitplanes(uint8_t mode) {
 	if ((mode == LCD_MODE_BLINK_1) || (mode == LCD_MODE_BLINK_2)) {
 		LCD_used_bitplanes = 2;
 		return; // just optimalization
-	} 
+	}
 
 	// mode must be LCD_MODE_ON or LCD_MODE_OFF
 	if (LCD_used_bitplanes == 1) {
 		return; // just optimalization, nothing to do
-	} 
+	}
 
-    for (i = 0; i < LCD_REGISTER_COUNT; i++){
-		#if LCD_BITPLANES != 2
-			#error optimized for 2 bitplanes // TODO?
-		#endif
+	for (i = 0; i < LCD_REGISTER_COUNT; i++){
+#if LCD_BITPLANES != 2
+#error optimized for 2 bitplanes // TODO?
+#endif
 		if (LCD_Data[0][i] != LCD_Data[1][i]) {
-			LCD_used_bitplanes=2;
+			LCD_used_bitplanes = 2;
 			return; // it is done
 		}
 	}
-	LCD_used_bitplanes=1;
+
+	LCD_used_bitplanes = 1;
 }
 
 
@@ -885,20 +890,19 @@ uint8_t LCD_force_update=0;        //!< \brief force update LCD
  ******************************************************************************/
 
 void task_lcd_update(void) {
-		uint8_t volatile *lcd_regs = &LCDDR0;
-		uint8_t i;
+	uint8_t volatile *lcd_regs = &LCDDR0;
+	uint8_t i;
 
-    if (++LCD_BlinkCounter > LCD_BLINK_FRAMES){
-		#if LCD_BITPLANES == 2
-			// optimized version for LCD_BITPLANES == 2
-			LCD_Bitplane = (LCD_Bitplane +1) & 1;
-		#else
-			LCD_Bitplane = (LCD_Bitplane +1) % LCD_BITPLANES;
-		#endif
-        LCD_BlinkCounter=0;
-		LCD_force_update=1;
-    }
-
+	if (++LCD_BlinkCounter > LCD_BLINK_FRAMES) {
+#if LCD_BITPLANES == 2
+		// optimized version for LCD_BITPLANES == 2
+		LCD_Bitplane = (LCD_Bitplane + 1) & 1;
+#else
+		LCD_Bitplane = (LCD_Bitplane + 1) % LCD_BITPLANES;
+#endif
+		LCD_BlinkCounter = 0;
+		LCD_force_update = 1;
+	}
 
 	if (LCD_force_update) {
 		LCD_force_update = 0;
@@ -906,8 +910,6 @@ void task_lcd_update(void) {
 			lcd_regs[i] = LCD_Data[LCD_Bitplane][i];
 		}
 	}
-
-
 
 	if (LCD_used_bitplanes == 1) {
 		// only one bitplane used, no blinking
