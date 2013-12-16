@@ -339,7 +339,7 @@ void LCD_PrintChar(uint8_t value, uint8_t pos, uint8_t mode)
 {
 	uint16_t segments;
 	uint8_t segmentOffset;
-	uint8_t mask;
+	uint16_t mask;
 	uint8_t i;
 
 	if (pos >= LCD_MAX_POS)
@@ -364,7 +364,7 @@ static uint8_t num2ch(uint8_t dec)
 {
 	if (dec > 16) {
 		return ' ';
-	} else if (dec > 10) {
+	} else if (dec >= 10) {
 		return 'A' + (dec - 10);
 	} else {
 		return '0' + dec;
@@ -393,8 +393,8 @@ void LCD_PrintHex(uint8_t value, uint8_t pos, uint8_t mode)
 	
 	for (i = 0; i < 2; i++) {
 		ch = num2ch(value & 0x0f);
-		LCD_PrintChar(ch, pos + i, mode);
-		value >>= 8;
+		LCD_PrintChar(num2ch(value & 0x0f), pos + i, mode);
+		value >>= 4;
 	}
 }
 
