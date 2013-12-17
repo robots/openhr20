@@ -100,7 +100,11 @@ static inline void MOTOR_H_BRIDGE_stop(void) {
 #endif
 }
 
+#if ZERO
+#define MOTOR_run_test() ((PORTE & (_BV(PE6)|_BV(PE7)))!=0)
+#else
 #define MOTOR_run_test() ((PORTG & ((1<<PG3)|(1<<PG4)))!=0)
+#endif
 
 //! How many photoeye impulses maximal form one endposition to the other. <BR>
 //! The value measured on a HR20 are 737 to 740 = so more than 1000 should

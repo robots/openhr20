@@ -122,7 +122,6 @@ int __attribute__ ((noreturn)) main(void)
 
 	// We should do the following once here to have valid data from the start
 
-
     /*!
     ****************************************************************************
     * main loop
@@ -384,16 +383,22 @@ static inline void init(void)
     power_down_ADC();
 
 #if ZERO
-	DDRE|= _BV(PE6) | _BV(PE7);
-#else
+	DDRE |= _BV(PE6) | _BV(PE7) | _BV(PE2);
+	PORTE &= ~(_BV(PE6) | _BV(PE7) | _BV(PE2));
+
+	DDRB &= ~(_BV(PB0) | _BV(PB4) | _BV(PB5) | _BV(PB6) | _BV(PB7));
+	PORTB |= _BV(PB0) | _BV(PB4) | _BV(PB5) | _BV(PB6) | _BV(PB7);
+
+	DIDR0 &= ~(_BV(PF3));
+	DDRF = (1<<PF3);          // PF3  activate tempsensor
+	PORTF = 0;//0xf3;
+#elif HR20
     //! digital I/O port direction
     DDRG = (1<<PG3)|(1<<PG4); // PG3, PG4 Motor out
 #endif
 
     //! enable pullup on all inputs (keys and m_wheel)
     //! ATTENTION: PB0 & PB6 is input, but we will select it only for read
-#if ZERO
-	PORTB = (1<<PB0)|(1<<PB4)|(1<<PB5)|(0<<PB6)|(0<<PB7);
 #if THERMOTRONIC
 	PORTB = (1<<PB0)|(1<<PB1)|(1<<PB2)|(0<<PB4)|(0<<PB5);
 #elif HR20 || HR25 
@@ -407,13 +412,11 @@ static inline void init(void)
 	//PORTE =                            (1<<PE1)|(1<<PE0); // TXD | RXD
 	DDRF  =          (1<<PF6)|(1<<PF5)|(1<<PF4)|(1<<PF3); // RFMSDI | RFMNSEL | RFMSCK | ACTTEMPSENS
     PORTF = (1<<PF7)|         (1<<PF5); // JTAGTDI | RFMNSEL;
-
 #elif (RFM_WIRE_TK_INTERNAL == 1)
     DDRE  = (1<<PE3)|(1<<PE1);                      // output: lighteye | TxD
     PORTE = (1<<PE0)|(1<<PE1)|(1<<PE2);             // pullup/activate: RxD | TxD | PE2
     DDRF  = (1<<PF0)|(1<<PF1)|(1<<PF3)|(1<<PF7);    // output: RFMnSEL | RFMSCK | tempsensor | RFMSDI
     PORTF = (1<<PF0)|(1<<PF4)|(1<<PF5)|(1<<PF6);    // pullup/activate: RFMnSel, TCK, TMS, TDO
-
 #elif (RFM_WIRE_JD_INTERNAL == 1)
     DDRE  = (1<<PE3)|(1<<PE1);  // PE3  activate lighteye
 	PORTE = (1<<PE2)|(1<<PE1)|(1<<PE0);  // TXD | RXD(pullup)
@@ -421,17 +424,11 @@ static inline void init(void)
     PORTF = 0xf0;
     PORTA = (1<<PA3); // RFMnSEL
     DDRA = (1<<PA3); // RFMnSEL
-
 #elif THERMOTRONIC	//Thermotronic without RFM
 	DDRE|=(1<<PE3);
 	PORTE|=(1<<PE3);
     DDRF = (1<<PF2); // PF2  activate tempsensor
     PORTF = 0xf5;
-
-#elif ZERO
-	DDRE|= _BV(PE2);
-	DDRF = (1<<PF3);          // PF3  activate tempsensor
-	PORTF = 0xf3;
 #elif HR20 || HR25 //HR20 without RFM
     DDRE = (1<<PE3)|(1<<PE1);  // PE3  activate lighteye
     PORTE = (1<<PE2)|(1<<PE1)|(1<<PE0); // PE2 | TXD | RXD(pullup);
@@ -445,7 +442,7 @@ static inline void init(void)
 
 #if ZERO
     //! PCMSK1 for keyactions
-    PCMSK1 = _BV(PCINT8) | _BV(PCINT12) | _BV(PCINT13) | _BV(PCINT14) | _BV(PCINT15);
+    PCMSK1 |= _BV(PCINT8) | _BV(PCINT12) | _BV(PCINT13) | _BV(PCINT14) | _BV(PCINT15);
 #elif THERMOTRONIC==1
 	PCMSK0=(1<<PCINT1);
     //! PCMSK1 for keyactions
@@ -455,8 +452,8 @@ static inline void init(void)
     PCMSK1 |= (1<<PCINT9)|(1<<PCINT10)|(1<<PCINT11)|(1<<PCINT13);
 #endif
 
-    //! activate PCINT0 + PCINT1
-    EIMSK = (1<<PCIE1)|(1<<PCIE0);
+    //! activate PCINT0 + PCINT1 + atmega169pa support
+    EIMSK |= _BV(PCIE1) | _BV(PCIE0) | 0x30;
 
     //! Initialize the RTC
     RTC_Init();
