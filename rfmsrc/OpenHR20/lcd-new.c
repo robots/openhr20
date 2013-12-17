@@ -534,7 +534,7 @@ void LCD_PrintTemp(uint8_t temp, uint8_t mode)
         LCD_PrintStringID(LCD_STRING_Err,mode); 
     } else {
         #define START_POS 1
-        LCD_PrintChar(LCD_CHAR_C, 0, mode);// Print C on last segment
+        LCD_PrintChar(LCD_CHAR_deg, 0, mode);// Print C on last segment
         LCD_SetSeg(LCD_SEG_COL1, mode);    // decimal point
 
         LCD_PrintDec(temp>>1, START_POS + 1, mode);
@@ -575,7 +575,7 @@ void LCD_PrintTempInt(int16_t temp, uint8_t mode)
     } 
 
     #define START_POS 1
-    LCD_PrintChar(LCD_CHAR_C, 0, mode);// Print C on last segment
+    LCD_PrintChar(LCD_CHAR_deg, 0, mode);// Print C on last segment
     LCD_SetSeg(LCD_SEG_COL1, mode);    // decimal point
 
     // 1/100°C not printed
