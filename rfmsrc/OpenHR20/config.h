@@ -81,9 +81,34 @@ In this file we define only configuration parameters, for example what kind of c
 #define ZERO 0
 #endif
 
+#ifndef HR20
+#define HR20 0
+#endif
+
+#if THERMOTRONIC
+#define HAVE_NEWLCD 0
+#define HAVE_WHEEL  1
+#define HAVE_COM    0
+#define HAVE_MONT   0
+#endif
+
+#if ZERO
+#define HAVE_NEWLCD 1
+#define HAVE_WHEEL  0
+#define HAVE_COM    0
+#define HAVE_MONT   0
+#endif
+
+#if HR20 || HR25
+#define HAVE_NEWLCD 0
+#define HAVE_WHEEL  1
+#define HAVE_COM    1
+#define HAVE_MONT   1
+#endif
+
 // Parameters for the COMM-Port
 #define COM_BAUD_RATE 9600
-#if !((THERMOTRONIC == 1) || (ZERO == 1))
+#if HAVE_COM
 // Note we should only enable of of the following at one time
 /* we support RS232 */
 #define COM_RS232 1

@@ -107,9 +107,10 @@ int __attribute__ ((noreturn)) main(void)
         task_lcd_update();
         for(;;) {;}  //fatal error, stop startup
     }
-#if !((THERMOTRONIC == 1) || (ZERO == 1))
+#if HAVE_COM
 	COM_init();
 #endif
+
     #if RFM
         // enable persistent RX for initial sync
         RFM_SPI_16(RFM_FIFO_IT(8) | RFM_FIFO_FF | RFM_FIFO_DR);
@@ -393,9 +394,9 @@ static inline void init(void)
     //! ATTENTION: PB0 & PB6 is input, but we will select it only for read
 #if ZERO
 	PORTB = (1<<PB0)|(1<<PB4)|(1<<PB5)|(0<<PB6)|(0<<PB7);
-#elif THERMOTRONIC
+#if THERMOTRONIC
 	PORTB = (1<<PB0)|(1<<PB1)|(1<<PB2)|(0<<PB4)|(0<<PB5);
-#else
+#elif HR20 || HR25 
     PORTB = (0<<PB0)|(1<<PB1)|(1<<PB2)|(1<<PB3)|(0<<PB6);
     DDRB = (1<<PB0)|(1<<PB4)|(1<<PB7)|(1<<PB6); // PB4, PB7 Motor out
 #endif
@@ -431,7 +432,7 @@ static inline void init(void)
 	DDRE|= _BV(PE2);
 	DDRF = (1<<PF3);          // PF3  activate tempsensor
 	PORTF = 0xf3;
-#else //HR20 without RFM
+#elif HR20 || HR25 //HR20 without RFM
     DDRE = (1<<PE3)|(1<<PE1);  // PE3  activate lighteye
     PORTE = (1<<PE2)|(1<<PE1)|(1<<PE0); // PE2 | TXD | RXD(pullup);
     DDRF = (1<<PF3);          // PF3  activate tempsensor
@@ -448,10 +449,10 @@ static inline void init(void)
 #elif THERMOTRONIC==1
 	PCMSK0=(1<<PCINT1);
     //! PCMSK1 for keyactions
-    PCMSK1 = (1<<PCINT9)|(1<<PCINT10)|(1<<PCINT8)|(1<<PCINT12);
-#else
+    PCMSK1 |= (1<<PCINT9)|(1<<PCINT10)|(1<<PCINT8)|(1<<PCINT12);
+#elif HR20 || HR25
     //! PCMSK1 for keyactions
-    PCMSK1 = (1<<PCINT9)|(1<<PCINT10)|(1<<PCINT11)|(1<<PCINT13);
+    PCMSK1 |= (1<<PCINT9)|(1<<PCINT10)|(1<<PCINT11)|(1<<PCINT13);
 #endif
 
     //! activate PCINT0 + PCINT1

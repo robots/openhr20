@@ -66,8 +66,7 @@ static bool allow_rewoke = false;
 void task_keyboard(void) {
 
  
-#if ZERO
-#else
+#if HAVE_WHEEL
  {	// wheel
 	uint8_t wheel= keys & (KBI_ROT1 | KBI_ROT2);
 	if ((wheel ^ state_wheel_prev) & KBI_ROT1) {	//only ROT1 have interrupt, change detection
@@ -91,10 +90,10 @@ void task_keyboard(void) {
  } // wheel
 #endif
  { // other keys
-#if ZERO
- 	uint8_t front = keys & ( KBI_PROG | KBI_C | KBI_AUTO | KBI_ROT1 | KBI_ROT2);
-#else
+#if HAVE_WHEEL
  	uint8_t front = keys & ( KBI_PROG | KBI_C | KBI_AUTO);
+#else
+ 	uint8_t front = keys & ( KBI_PROG | KBI_C | KBI_AUTO | KBI_ROT1 | KBI_ROT2);
 #endif
 	if (front != state_front_prev) {
 		if (front && (state_front_prev == 0) && kb_timeout) {
@@ -107,7 +106,7 @@ void task_keyboard(void) {
 			} else if (front == KBI_AUTO) {
 				kb_events |= KB_EVENT_AUTO;
 				allow_rewoke = true;
-#if ZERO
+#if HAVE_WHEEL == 0
 			} else if (front == KBI_ROT1) {
 				kb_events |= KB_EVENT_WHEEL_MINUS;
 			} else if (front == KBI_ROT2) {
@@ -202,7 +201,7 @@ void task_keyboard_long_press_detect(void) {
  *  - read keyboard status
  ******************************************************************************/
 bool mont_contact_pooling(void){
-#if THERMOTRONIC || ZERO || DEBUG_IGNORE_MONT_CONTACT
+#if (HAVE_MONT == 0) || DEBUG_IGNORE_MONT_CONTACT
 	return 1; //no contact - exit!
 #else
    bool mont_contact;

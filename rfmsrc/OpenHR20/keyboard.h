@@ -65,7 +65,7 @@ extern uint16_t kb_events;
 #define KBI_AUTO	(1 << 6)
 #define KBI_ROT1	(1 << 7)
 #define KBI_ROT2	(1 << 0)
-#elif THERMOTRONIC==1
+#elif THERMOTRONIC
 #define KBI_MONT 	(1 << 0)
 #define KBI_C		(1 << 2) 
 #define KBI_PROG	(1 << 1) 
@@ -91,7 +91,7 @@ bool mont_contact_pooling(void);
 #define disable_rot2_input()
 #define enable_mont_input()
 #define disable_mont_input()
-#elif THERMOTRONIC==1
+#elif THERMOTRONIC
 //THERMOTRONIC has no contact, not needed this macros
 #define enable_mont_input()
 #define disable_mont_input()

@@ -104,7 +104,7 @@ SRC_B =  \
     eeprom.c \
     menu.c \
     rs232_485_hw.c \
-
+    lcd.c 
 
 
 # List Assembler source files here.
@@ -205,12 +205,11 @@ endif
 ifeq ($(HW),HR25)
     CFLAGS += -DHR25=1
 endif
-
+ifeq ($(HW),HONEYWELL)
+    CFLAGS += -DHR20=1
+endif
 ifeq ($(HW),ZERO)
 	CFLAGS += -DZERO=1
-	SRC_B += lcd-new.c 
-else
-	SRC_B += lcd-old.c 
 endif
 
 #---------------- Assembler Options ----------------
