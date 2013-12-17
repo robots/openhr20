@@ -492,15 +492,21 @@ void menu_view(bool clear) {
     case menu_set_hour:
     case menu_set_minute: 
     case menu_home4: // time
-//        if (clear) clr_show2(LCD_SEG_COL1,LCD_SEG_COL2);
+#if HAVE_NEWLCD
         if (clear) clr_show1(LCD_SEG_COL2);
+#else
+        if (clear) clr_show2(LCD_SEG_COL1,LCD_SEG_COL2);
+#endif
         LCD_PrintDec(RTC_GetHour(), 2, ((menu_state == menu_set_hour) ? LCD_MODE_BLINK_1 : LCD_MODE_ON));
         LCD_PrintDec(RTC_GetMinute(), 0, ((menu_state == menu_set_minute) ? LCD_MODE_BLINK_1 : LCD_MODE_ON));
        break;                                       
 #else
     case menu_home4: // time
-//        if (clear) clr_show2(LCD_SEG_COL1,LCD_SEG_COL2);
+#if HAVE_NEWLCD
         if (clear) clr_show1(LCD_SEG_COL2);
+#else
+        if (clear) clr_show2(LCD_SEG_COL1,LCD_SEG_COL2);
+#endif
         LCD_PrintDec(RTC_GetHour(), 2,  LCD_MODE_ON);
         LCD_PrintDec(RTC_GetMinute(), 0, LCD_MODE_ON);
        break;                                       
@@ -519,12 +525,12 @@ void menu_view(bool clear) {
             clr_show1(LCD_SEG_BAR24);
             LCD_PrintChar(LCD_CHAR_A,3,LCD_MODE_ON);
             if (MOTOR_ManuCalibration==-1) LCD_PrintChar(LCD_CHAR_d,2,LCD_MODE_ON);
-            LCD_PrintChar(MOTOR_calibration_step%10, 0, LCD_MODE_ON);
+            LCD_PrintChar(LCD_CHAR_0 + (MOTOR_calibration_step%10), 0, LCD_MODE_ON);
             goto MENU_COMMON_STATUS; // optimization
         } else {
             if (clear) clr_show1(LCD_SEG_BAR24);
             if (CTL_error!=0) {
-#if ZERO==0
+#if HAVE_NEWLCD==0
                 if (CTL_error & CTL_ERR_BATT_LOW) {
                     LCD_PrintStringID(LCD_STRING_BAtt,LCD_MODE_BLINK_1);
                 } else
@@ -534,7 +540,7 @@ void menu_view(bool clear) {
                 } else if (CTL_error & CTL_ERR_MOTOR) {
                     LCD_PrintStringID(LCD_STRING_E3,LCD_MODE_ON);
                 } else
-#if ZERO==0
+#if HAVE_NEWLCD==0
 								if (CTL_error & CTL_ERR_BATT_WARNING) {
                     LCD_PrintStringID(LCD_STRING_BAtt,LCD_MODE_ON);
                 } else
@@ -558,7 +564,7 @@ void menu_view(bool clear) {
         MENU_COMMON_STATUS:
         LCD_SetSeg(LCD_SEG_AUTO, (CTL_test_auto()?LCD_MODE_ON:LCD_MODE_OFF));
         LCD_SetSeg(LCD_SEG_MANU, (CTL_mode_auto?LCD_MODE_OFF:LCD_MODE_ON));
-#if ZERO
+#if HAVE_NEWLCD
 				if (CTL_error & (CTL_ERR_BATT_LOW | CTL_ERR_BATT_WARNING))
 					LCD_SetSeg(LCD_SEG_BAT, (CTL_error & CTL_ERR_BATT_LOW)?LCD_MODE_BLINK_1:LCD_MODE_ON);
 #endif

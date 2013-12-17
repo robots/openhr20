@@ -349,7 +349,11 @@ void LCD_PrintChar(uint8_t value, uint8_t pos, uint8_t mode)
 	pos = 3 - pos;
 #endif
 
-	segments = pgm_read_word(&Font[value - FONT_ASCII_OFFSET]);
+	if (value == ' ') {
+		segments = 0; // TODO: expand Font
+	} else {
+		segments = pgm_read_word(&Font[value - FONT_ASCII_OFFSET]);
+	}
 	segmentOffset = pos * SEGMENTS_PER_DIGIT;
 	mask = 1;
 
@@ -534,7 +538,7 @@ void LCD_PrintTemp(uint8_t temp, uint8_t mode)
         LCD_SetSeg(LCD_SEG_COL1, mode);    // decimal point
 
         LCD_PrintDec(temp>>1, START_POS + 1, mode);
-        LCD_PrintChar(((temp&1)?5:0), START_POS, mode);
+        LCD_PrintChar(((temp&1)?LCD_CHAR_5:LCD_CHAR_0), START_POS, mode);
         if (temp < (100/5)) {
             LCD_PrintChar(LCD_CHAR_NULL, START_POS + 2, mode);
         }
