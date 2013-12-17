@@ -421,7 +421,7 @@ static inline void init(void)
 	RFM_SDI_DDR &= ~_BV(RFM_SDI_BITPOS);
 	RFM_NSEL_DDR |= ~_BV(RFM_NSEL_BITPOS);
 	RFM_SDO_DDR |= _BV(RFM_SDO_BITPOS);
-	RFM_SDO_PCMSK |= _BV(RFM_SDO_PCINT);	
+	RFM_PCMSK |= _BV(RFM_SDO_PCINT);	
 #endif
 
     //! remark for PCMSK0:

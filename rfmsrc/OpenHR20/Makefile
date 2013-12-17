@@ -104,8 +104,8 @@ SRC_B =  \
     eeprom.c \
     menu.c \
     rs232_485_hw.c \
-    lcd.c 
-
+    lcd.c \
+    rfmisr.c
 
 # List Assembler source files here.
 #     Make them always end in a capital .S.  Files ending in a lowercase .s
@@ -294,7 +294,7 @@ LDFLAGS += -L/usr/avr/lib/avr5
 # Type: avrdude -c ?
 # to get a full listing.
 #
-AVRDUDE_PROGRAMMER = avrispmkII  #stk500v2
+AVRDUDE_PROGRAMMER = usbasp
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
 AVRDUDE_PORT = usb  #com1    # programmer connected to serial device
@@ -303,7 +303,7 @@ AVRDUDE_PORT = usb  #com1    # programmer connected to serial device
 AVRDUDE_DELAY = -B 12
 
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
-#AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
+AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
 
 
 # Uncomment the following if you want avrdude's erase cycle counter.

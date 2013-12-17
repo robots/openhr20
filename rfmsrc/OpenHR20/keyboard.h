@@ -80,6 +80,7 @@ extern uint16_t kb_events;
 #define KBI_ROT1	(1 << 5)
 #define KBI_ROT2	(1 << 6)
 #endif
+#define KBI_ALL   ((KBI_C | KBI_PROG | KBI_AUTO | KBI_ROT1 | KBI_ROT2))
 
 extern uint8_t state_wheel_prev;
 void task_keyboard(void);

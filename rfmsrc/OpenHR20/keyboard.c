@@ -237,16 +237,26 @@ bool mont_contact_pooling(void){
  *  - create task for keyboard scan and wake up
  *  - read keyboard status
  ******************************************************************************/
-ISR(PCINT1_vect){
-    enable_rot2_input();
-    task |= TASK_KB;
-    asm volatile ("nop");
+ISR(PCINT1_vect) {
+	static uint8_t pinb_last;
+	uint8_t pinb = PINB;
 
-    // crazy oder of instructions, bud we need any instructions
-    // between PORTB setting and reading PINB due to AVR design
-    keys = ~PINB
-      & (KBI_C | KBI_PROG | KBI_AUTO | KBI_ROT1 | KBI_ROT2); 
+	enable_rot2_input();
+
+	asm volatile ("nop");
+	asm volatile ("nop");
+
+	if ((PCMSK1 & KBI_ALL) && ((((pinb ^ pinb_last) & KBI_ALL)) != 0)) {
+			task |= TASK_KB;
+			keys = ~PINB & KBI_ALL;
       // low active
 
-    disable_rot2_input();
+	}
+
+	disable_rot2_input();
+
+	pinb_last = pinb;
+#if ((RFM==1) && (RFM_SDO_PCMSK==1))
+	RFM_isr();
+#endif
 }
