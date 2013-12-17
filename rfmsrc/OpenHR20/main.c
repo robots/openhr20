@@ -392,48 +392,36 @@ static inline void init(void)
 	DIDR0 &= ~(_BV(PF3));
 	DDRF = (1<<PF3);          // PF3  activate tempsensor
 	PORTF = 0;//0xf3;
-#elif HR20
-    //! digital I/O port direction
-    DDRG = (1<<PG3)|(1<<PG4); // PG3, PG4 Motor out
-#endif
 
-    //! enable pullup on all inputs (keys and m_wheel)
-    //! ATTENTION: PB0 & PB6 is input, but we will select it only for read
-#if THERMOTRONIC
+ #if RFM
+	DIDR0 &= ~(0xf0);
+ #endif
+#elif THERMOTRONIC
 	PORTB = (1<<PB0)|(1<<PB1)|(1<<PB2)|(0<<PB4)|(0<<PB5);
-#elif HR20 || HR25 
-    PORTB = (0<<PB0)|(1<<PB1)|(1<<PB2)|(1<<PB3)|(0<<PB6);
-    DDRB = (1<<PB0)|(1<<PB4)|(1<<PB7)|(1<<PB6); // PB4, PB7 Motor out
-#endif
 
-#if (RFM_WIRE_MARIOJTAG == 1)
-    DDRE  = (1<<PE3)|                  (1<<PE1); // ACTLIGHTEYE | TXD
-	PORTE =                            (1<<PE1)|(1<<PE0); // TXD | RXD
-	//PORTE =                            (1<<PE1)|(1<<PE0); // TXD | RXD
-	DDRF  =          (1<<PF6)|(1<<PF5)|(1<<PF4)|(1<<PF3); // RFMSDI | RFMNSEL | RFMSCK | ACTTEMPSENS
-    PORTF = (1<<PF7)|         (1<<PF5); // JTAGTDI | RFMNSEL;
-#elif (RFM_WIRE_TK_INTERNAL == 1)
-    DDRE  = (1<<PE3)|(1<<PE1);                      // output: lighteye | TxD
-    PORTE = (1<<PE0)|(1<<PE1)|(1<<PE2);             // pullup/activate: RxD | TxD | PE2
-    DDRF  = (1<<PF0)|(1<<PF1)|(1<<PF3)|(1<<PF7);    // output: RFMnSEL | RFMSCK | tempsensor | RFMSDI
-    PORTF = (1<<PF0)|(1<<PF4)|(1<<PF5)|(1<<PF6);    // pullup/activate: RFMnSel, TCK, TMS, TDO
-#elif (RFM_WIRE_JD_INTERNAL == 1)
-    DDRE  = (1<<PE3)|(1<<PE1);  // PE3  activate lighteye
-	PORTE = (1<<PE2)|(1<<PE1)|(1<<PE0);  // TXD | RXD(pullup)
-    DDRF  = (1<<PF0)|(1<<PF1)|(1<<PF3);  // RFMSDI | RFMSCK | PF3  activate tempsensor
-    PORTF = 0xf0;
-    PORTA = (1<<PA3); // RFMnSEL
-    DDRA = (1<<PA3); // RFMnSEL
-#elif THERMOTRONIC	//Thermotronic without RFM
 	DDRE|=(1<<PE3);
 	PORTE|=(1<<PE3);
-    DDRF = (1<<PF2); // PF2  activate tempsensor
-    PORTF = 0xf5;
-#elif HR20 || HR25 //HR20 without RFM
-    DDRE = (1<<PE3)|(1<<PE1);  // PE3  activate lighteye
-    PORTE = (1<<PE2)|(1<<PE1)|(1<<PE0); // PE2 | TXD | RXD(pullup);
-    DDRF = (1<<PF3);          // PF3  activate tempsensor
-    PORTF = 0xf3;
+	DDRF = (1<<PF2); // PF2  activate tempsensor
+	PORTF = 0xf5;
+#elif HR20 || HR25 
+	PORTB = (0<<PB0)|(1<<PB1)|(1<<PB2)|(1<<PB3)|(0<<PB6);
+	DDRB = (1<<PB0)|(1<<PB4)|(1<<PB7)|(1<<PB6); // PB4, PB7 Motor out
+
+	DDRE = (1<<PE3)|(1<<PE1);  // PE3  activate lighteye
+	PORTE = (1<<PE2)|(1<<PE1)|(1<<PE0); // PE2 | TXD | RXD(pullup);
+	DDRF = (1<<PF3);          // PF3  activate tempsensor
+	PORTF = 0xf3;
+
+	//! digital I/O port direction
+	DDRG = (1<<PG3)|(1<<PG4); // PG3, PG4 Motor out
+#endif
+
+#if RFM
+	RFM_SCK_DDR |= _BV(RFM_SCK_BITPOS);
+	RFM_SDI_DDR &= ~_BV(RFM_SDI_BITPOS);
+	RFM_NSEL_DDR |= ~_BV(RFM_NSEL_BITPOS);
+	RFM_SDO_DDR |= _BV(RFM_SDO_BITPOS);
+	RFM_SDO_PCMSK |= _BV(RFM_SDO_PCINT);	
 #endif
 
     //! remark for PCMSK0:
